@@ -111,7 +111,6 @@ view_state = pdk.ViewState(
 r = pdk.Deck(
     layers=[layer],
     initial_view_state=view_state,
-    mapbox_key=MAPBOX_KEY,
     tooltip={"text": "海拔高度: {elevationValue} 公尺"}
 )
 st.pydeck_chart(r)
