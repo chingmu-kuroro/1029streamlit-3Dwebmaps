@@ -72,50 +72,46 @@ r = pdk.Deck(
 
 st.title("Pydeck 3D 地圖 (網格 - DEM 模擬)")
 
-if "mapbox_api_key" not in st.secrets:
-    st.error("Mapbox API Key 未設定！")
-else:
-    MAPBOX_KEY = st.secrets["mapbox_api_key"]
 
-    # --- 1. 模擬 DEM 網格資料 ---
-    # 建立 50x50 的網格
-    x, y = np.meshgrid(np.linspace(-1, 1, 50), np.linspace(-1, 1, 50))
-    # 建立一個中央高、四周低的 2D "高斯" 數據 (模擬山丘)
-    z = np.exp(-(x**2 + y**2) * 2) * 1000  # 模擬 1000 公尺高的山
+# --- 1. 模擬 DEM 網格資料 ---
+# 建立 50x50 的網格
+x, y = np.meshgrid(np.linspace(-1, 1, 50), np.linspace(-1, 1, 50))
+# 建立一個中央高、四周低的 2D "高斯" 數據 (模擬山丘)
+z = np.exp(-(x**2 + y**2) * 2) * 1000  # 模擬 1000 公尺高的山
 
-    # 將網格資料轉換成 Pydeck 需要的 DataFrame
-    data = []
-    base_lat, base_lon = 25.0, 121.5 # 台北盆地
-    for i in range(50):
-        for j in range(50):
-            data.append({
-                "lon": base_lon + x[i, j] * 0.1,
-                "lat": base_lat + y[i, j] * 0.1,
-                "elevation": z[i, j] # 海拔
-            })
-    df_dem = pd.DataFrame(data)
+# 將網格資料轉換成 Pydeck 需要的 DataFrame
+data = []
+base_lat, base_lon = 25.0, 121.5 # 台北盆地
+for i in range(50):
+    for j in range(50):
+         data.append({
+            "lon": base_lon + x[i, j] * 0.1,
+            "lat": base_lat + y[i, j] * 0.1,
+            "elevation": z[i, j] # 海拔
+        })
+df_dem = pd.DataFrame(data)
 
-    # --- 2. 設定 Pydeck 圖層 (GridLayer) ---
-    layer = pdk.Layer(
-        'GridLayer',
-        data=df_dem,
-        get_position='[lon, lat]',
-        get_elevation_weight='elevation', # *** 關鍵：用 'elevation' 欄位當作高度 ***
-        elevation_scale=1, # 高度乘數 (因為 Z 已經是海拔，設 1 即可)
-        cell_size=2000,     # 每個格的大小 (公尺)
-        extruded=True,      # *** 關鍵：擠出 3D ***
-    )
+# --- 2. 設定 Pydeck 圖層 (GridLayer) ---
+layer = pdk.Layer(
+    'GridLayer',
+    data=df_dem,
+    get_position='[lon, lat]',
+    get_elevation_weight='elevation', # *** 關鍵：用 'elevation' 欄位當作高度 ***
+    elevation_scale=1, # 高度乘數 (因為 Z 已經是海拔，設 1 即可)
+    cell_size=2000,     # 每個格的大小 (公尺)
+    extruded=True,      # *** 關鍵：擠出 3D ***
+)
     
-    # --- 3. 設定視角 (View) ---
-    view_state = pdk.ViewState(
-        latitude=base_lat, longitude=base_lon, zoom=10, pitch=50
-    )
+# --- 3. 設定視角 (View) ---
+view_state = pdk.ViewState(
+    latitude=base_lat, longitude=base_lon, zoom=10, pitch=50
+)
 
-    # --- 4. 組合並顯示 ---
-    r = pdk.Deck(
-        layers=[layer],
-        initial_view_state=view_state,
-        mapbox_key=MAPBOX_KEY,
-        tooltip={"text": "海拔高度: {elevationValue} 公尺"}
-    )
-    st.pydeck_chart(r)
+# --- 4. 組合並顯示 ---
+r = pdk.Deck(
+    layers=[layer],
+    initial_view_state=view_state,
+    mapbox_key=MAPBOX_KEY,
+    tooltip={"text": "海拔高度: {elevationValue} 公尺"}
+)
+st.pydeck_chart(r)
