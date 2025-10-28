@@ -42,11 +42,9 @@ view_state = pdk.ViewState(
 )
 
 # --- 4. 組合圖層和視角並顯示 ---
-# 【修正點】移除 mapbox_key 參數
 r = pdk.Deck(
     layers=[layer],
     initial_view_state=view_state,
-    # mapbox_key=MAPBOX_KEY, # <-- 移除這一行
     tooltip={"text": "這個區域有 {elevationValue} 個熱點"}
 )
 st.pydeck_chart(r)
