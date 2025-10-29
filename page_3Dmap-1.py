@@ -38,6 +38,7 @@ view_state_hexagon = pdk.ViewState( # 稍微改個名字避免混淆
 
 # --- 4. 組合圖層和視角並顯示 (第一個地圖) ---
 r_hexagon = pdk.Deck( # 稍微改個名字避免混淆
+    map_style="mapbox://styles/mapbox/light-v9",
     layers=[layer_hexagon],
     initial_view_state=view_state_hexagon,
     # mapbox_key=MAPBOX_KEY, # <-- 移除
